@@ -1,0 +1,35 @@
+version: "3"
+services:
+    laravel:
+        build:
+            context: .
+            args:
+                TARGET: development
+        restart: unless-stopped
+        command: php artisan serve --host 0.0.0.0
+        ports:
+            - 8002:8000
+        volumes:
+            - .:/var/www/html
+        user: "${UID:-1000}:${GID:-1000}"
+        networks:
+          products:
+            aliases:
+              - laravel
+    postgresql:
+        image: postgis/postgis:15-3.4
+        volumes:
+            - ./database/postgresql-init/:/docker-entrypoint-initdb.d/
+        ports:
+            - 5435:5432
+        environment:
+            POSTGRES_DB: "${DB_DATABASE}"
+            POSTGRES_USER: "${DB_USERNAME}"
+            POSTGRES_PASSWORD: "${DB_PASSWORD}"
+        networks:
+          products:
+            aliases:
+              - postgresql
+networks:
+  products:
+
